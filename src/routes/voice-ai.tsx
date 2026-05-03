@@ -4,6 +4,12 @@ import { Mic, Square, AlertTriangle, Shield, Hospital, Flame, X, Activity } from
 import { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/voice-ai")({
+  head: () => ({
+    meta: [
+      { title: "Smart Emergency Detection · Her_Shield" },
+      { name: "description", content: "AI-powered Smart Emergency Detection — listens for panic, stress, and emergency keywords." },
+    ],
+  }),
   component: VoiceAI,
 });
 
@@ -52,7 +58,7 @@ function VoiceAI() {
     const history = JSON.parse(localStorage.getItem("hs_alerts") || "[]");
     history.unshift({
       id: Date.now(),
-      type: `Voice AI · ${type}`,
+      type: `Smart Detection · ${type}`,
       risk,
       time: new Date().toISOString(),
       sentTo: risk === "HIGH" ? "All contacts + Police" : "Logged",
@@ -73,7 +79,7 @@ function VoiceAI() {
 
   return (
     <AppLayout>
-      <PageHeader title="AI Voice Risk Detection" subtitle="Smart voice analysis for panic, stress, and emergency keywords." icon={Mic} />
+      <PageHeader title="Smart Emergency Detection" subtitle="AI listens for panic, stress, and emergency keywords in real time." icon={Mic} />
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Recorder */}
