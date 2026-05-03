@@ -11,8 +11,8 @@ type Alert = { id: number; type: string; risk: string; time: string; sentTo: str
 
 const seed: Alert[] = [
   { id: 1, type: "SOS Emergency", risk: "HIGH", time: "2026-04-29T21:42:00", sentTo: "All trusted contacts", status: "Delivered" },
-  { id: 2, type: "Voice AI · Police", risk: "MEDIUM", time: "2026-04-21T18:10:00", sentTo: "Logged", status: "Analyzed" },
-  { id: 3, type: "Voice AI · Medical", risk: "HIGH", time: "2026-04-12T23:15:00", sentTo: "All contacts + Hospital", status: "Escalated" },
+  { id: 2, type: "Smart Detection · Police", risk: "MEDIUM", time: "2026-04-21T18:10:00", sentTo: "Logged", status: "Analyzed" },
+  { id: 3, type: "Smart Detection · Medical", risk: "HIGH", time: "2026-04-12T23:15:00", sentTo: "All contacts + Hospital", status: "Escalated" },
   { id: 4, type: "Fake Call", risk: "LOW", time: "2026-04-08T14:30:00", sentTo: "Self", status: "Triggered" },
 ];
 

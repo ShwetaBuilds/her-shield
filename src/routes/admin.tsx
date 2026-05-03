@@ -25,8 +25,8 @@ function Admin() {
 
   const recentAlerts = [
     { user: "Priya S.", type: "SOS Emergency", location: "Sector 5", time: "2 min ago", risk: "HIGH" },
-    { user: "Anita R.", type: "Voice AI · Police", location: "MG Road", time: "8 min ago", risk: "MEDIUM" },
-    { user: "Sneha K.", type: "Voice AI · Medical", location: "Park Avenue", time: "15 min ago", risk: "HIGH" },
+    { user: "Anita R.", type: "Smart Detection · Police", location: "MG Road", time: "8 min ago", risk: "MEDIUM" },
+    { user: "Sneha K.", type: "Smart Detection · Medical", location: "Park Avenue", time: "15 min ago", risk: "HIGH" },
     { user: "Riya M.", type: "Fake Call", location: "Mall Plaza", time: "22 min ago", risk: "LOW" },
     { user: "Kavya P.", type: "SOS Emergency", location: "Bus Stand", time: "31 min ago", risk: "HIGH" },
   ];
@@ -81,7 +81,7 @@ function Admin() {
           <div className="space-y-4">
             {[
               { label: "SOS Triggers", value: 75, color: "bg-rose-500" },
-              { label: "Voice AI Detections", value: 60, color: "bg-purple-500" },
+              { label: "Smart Detection Detections", value: 60, color: "bg-purple-500" },
               { label: "Fake Calls", value: 35, color: "bg-amber-500" },
               { label: "Resolved Cases", value: 90, color: "bg-emerald-500" },
             ].map((m) => (
