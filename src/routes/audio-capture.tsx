@@ -8,10 +8,10 @@ export const Route = createFileRoute("/audio-capture")({
 
 const recordings = [
   { date: "2026-04-29", time: "21:42", duration: "01:24", type: "SOS Trigger", risk: "HIGH" },
-  { date: "2026-04-21", time: "18:10", duration: "00:48", type: "Voice AI · Police", risk: "MEDIUM" },
+  { date: "2026-04-21", time: "18:10", duration: "00:48", type: "Smart Detection · Police", risk: "MEDIUM" },
   { date: "2026-04-12", time: "23:15", duration: "02:11", type: "SOS Trigger", risk: "HIGH" },
-  { date: "2026-04-03", time: "07:55", duration: "00:32", type: "Voice AI · General", risk: "LOW" },
-  { date: "2026-03-28", time: "20:01", duration: "01:55", type: "Voice AI · Medical", risk: "MEDIUM" },
+  { date: "2026-04-03", time: "07:55", duration: "00:32", type: "Smart Detection · General", risk: "LOW" },
+  { date: "2026-03-28", time: "20:01", duration: "01:55", type: "Smart Detection · Medical", risk: "MEDIUM" },
 ];
 
 const riskBadge = {

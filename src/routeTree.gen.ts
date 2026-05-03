@@ -14,6 +14,7 @@ import { Route as TrustCircleRouteImport } from './routes/trust-circle'
 import { Route as SosRouteImport } from './routes/sos'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MapRouteImport } from './routes/map'
+import { Route as HowToUseRouteImport } from './routes/how-to-use'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as HelpCentersRouteImport } from './routes/help-centers'
 import { Route as FakeCallRouteImport } from './routes/fake-call'
@@ -46,6 +47,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const MapRoute = MapRouteImport.update({
   id: '/map',
   path: '/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowToUseRoute = HowToUseRouteImport.update({
+  id: '/how-to-use',
+  path: '/how-to-use',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomeRoute = HomeRouteImport.update({
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/fake-call': typeof FakeCallRoute
   '/help-centers': typeof HelpCentersRoute
   '/home': typeof HomeRoute
+  '/how-to-use': typeof HowToUseRoute
   '/map': typeof MapRoute
   '/profile': typeof ProfileRoute
   '/sos': typeof SosRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/fake-call': typeof FakeCallRoute
   '/help-centers': typeof HelpCentersRoute
   '/home': typeof HomeRoute
+  '/how-to-use': typeof HowToUseRoute
   '/map': typeof MapRoute
   '/profile': typeof ProfileRoute
   '/sos': typeof SosRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/fake-call': typeof FakeCallRoute
   '/help-centers': typeof HelpCentersRoute
   '/home': typeof HomeRoute
+  '/how-to-use': typeof HowToUseRoute
   '/map': typeof MapRoute
   '/profile': typeof ProfileRoute
   '/sos': typeof SosRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/fake-call'
     | '/help-centers'
     | '/home'
+    | '/how-to-use'
     | '/map'
     | '/profile'
     | '/sos'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/fake-call'
     | '/help-centers'
     | '/home'
+    | '/how-to-use'
     | '/map'
     | '/profile'
     | '/sos'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/fake-call'
     | '/help-centers'
     | '/home'
+    | '/how-to-use'
     | '/map'
     | '/profile'
     | '/sos'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   FakeCallRoute: typeof FakeCallRoute
   HelpCentersRoute: typeof HelpCentersRoute
   HomeRoute: typeof HomeRoute
+  HowToUseRoute: typeof HowToUseRoute
   MapRoute: typeof MapRoute
   ProfileRoute: typeof ProfileRoute
   SosRoute: typeof SosRoute
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/map'
       fullPath: '/map'
       preLoaderRoute: typeof MapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-to-use': {
+      id: '/how-to-use'
+      path: '/how-to-use'
+      fullPath: '/how-to-use'
+      preLoaderRoute: typeof HowToUseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/home': {
@@ -304,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   FakeCallRoute: FakeCallRoute,
   HelpCentersRoute: HelpCentersRoute,
   HomeRoute: HomeRoute,
+  HowToUseRoute: HowToUseRoute,
   MapRoute: MapRoute,
   ProfileRoute: ProfileRoute,
   SosRoute: SosRoute,
@@ -313,12 +334,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

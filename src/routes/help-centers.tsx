@@ -1,58 +1,93 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout, PageHeader } from "@/components/hershield/AppLayout";
-import { Hospital, Phone, Navigation, Shield, Pill, ShieldCheck } from "lucide-react";
+import { ShieldCheck, Phone, Navigation, MapPin, Hospital, Shield, Pill, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { LiveMap, SAFE_PLACES, type Place } from "@/components/hershield/LiveMap";
 
 export const Route = createFileRoute("/help-centers")({
+  head: () => ({
+    meta: [
+      { title: "Nearest Safe Place · Her_Shield" },
+      { name: "description", content: "Find the nearest hospitals, police stations, medical stores, and safe public places around you." },
+    ],
+  }),
   component: HelpCenters,
 });
 
-const centers = [
-  { icon: Shield, name: "Sector 5 Police Station", category: "Police", distance: "0.8 km", phone: "100", color: "from-blue-500 to-indigo-600" },
-  { icon: Hospital, name: "City Care Hospital", category: "Hospital", distance: "1.2 km", phone: "102", color: "from-rose-500 to-pink-600" },
-  { icon: Pill, name: "Apollo Pharmacy", category: "Medical Store", distance: "0.4 km", phone: "+91 98765 43210", color: "from-emerald-500 to-teal-500" },
-  { icon: ShieldCheck, name: "Mall Plaza Safe Zone", category: "Safe Zone", distance: "0.6 km", phone: "1091", color: "from-purple-500 to-fuchsia-600" },
-  { icon: Hospital, name: "Lifeline Multispecialty", category: "Hospital", distance: "2.1 km", phone: "+91 99887 76655", color: "from-rose-500 to-pink-600" },
-  { icon: Shield, name: "MG Road Police Outpost", category: "Police", distance: "1.5 km", phone: "100", color: "from-blue-500 to-indigo-600" },
-  { icon: Pill, name: "MedPlus 24/7", category: "Medical Store", distance: "1.0 km", phone: "+91 91234 56789", color: "from-emerald-500 to-teal-500" },
-  { icon: ShieldCheck, name: "University Safe Zone", category: "Safe Zone", distance: "1.8 km", phone: "1091", color: "from-purple-500 to-fuchsia-600" },
+const sections: { key: Place["category"]; label: string; icon: React.ComponentType<{ className?: string }>; color: string }[] = [
+  { key: "Hospital", label: "Hospitals", icon: Hospital, color: "from-rose-500 to-pink-600" },
+  { key: "Police", label: "Police Stations", icon: Shield, color: "from-blue-500 to-indigo-600" },
+  { key: "Medical Store", label: "Medical Stores", icon: Pill, color: "from-emerald-500 to-teal-500" },
+  { key: "Safe Place", label: "Safe Public Places", icon: Sparkles, color: "from-purple-500 to-fuchsia-600" },
 ];
 
 function HelpCenters() {
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const openMaps = (p: Place) => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const dLat = pos.coords.latitude + p.offsetLat / 111320;
+      const dLng = pos.coords.longitude + p.offsetLng / (111320 * Math.cos((pos.coords.latitude * Math.PI) / 180));
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${dLat},${dLng}&travelmode=driving`, "_blank");
+    });
+  };
+
   return (
     <AppLayout>
-      <PageHeader title="Nearby Help Centers" subtitle="Verified safe places, sorted by distance." icon={Hospital} />
+      <PageHeader title="Nearest Safe Place" subtitle="Verified hospitals, police, medical stores & safe public spaces around you." icon={ShieldCheck} />
 
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {["All", "Police", "Hospital", "Medical Store", "Safe Zone"].map((c, i) => (
-          <button key={c} className={`px-4 py-2 rounded-full text-sm font-semibold ${i === 0 ? "bg-gradient-primary text-white shadow-soft" : "glass"}`}>{c}</button>
-        ))}
+      <div className="mb-8">
+        <LiveMap places={SAFE_PLACES} selectedId={selected} onSelect={(p) => setSelected(p.id)} />
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        {centers.map((c) => (
-          <div key={c.name} className="glass rounded-2xl p-5 flex items-start gap-4 hover:-translate-y-0.5 transition-all">
-            <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${c.color} flex items-center justify-center shadow-soft shrink-0`}>
-              <c.icon className="w-7 h-7 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="font-bold">{c.name}</div>
-                  <div className="text-xs text-muted-foreground">{c.category}</div>
+      <div className="space-y-8">
+        {sections.map((s) => {
+          const items = SAFE_PLACES.filter((p) => p.category === s.key);
+          return (
+            <div key={s.key}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${s.color} flex items-center justify-center shadow-soft`}>
+                  <s.icon className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xs font-semibold text-primary whitespace-nowrap">{c.distance}</span>
+                <h2 className="text-xl font-bold">{s.label}</h2>
+                <span className="text-xs text-muted-foreground">{items.length} nearby</span>
               </div>
-              <div className="flex gap-2 mt-3">
-                <a href={`tel:${c.phone}`} className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-semibold flex items-center gap-1">
-                  <Phone className="w-3 h-3" /> {c.phone}
-                </a>
-                <button className="px-3 py-1.5 rounded-xl bg-white/70 border border-border text-xs font-semibold flex items-center gap-1">
-                  <Navigation className="w-3 h-3" /> Directions
-                </button>
+              <div className="grid md:grid-cols-2 gap-4">
+                {items.map((p) => (
+                  <div
+                    key={p.id}
+                    className={`glass rounded-2xl p-5 transition-all cursor-pointer hover:-translate-y-0.5 ${selected === p.id ? "ring-2 ring-primary/50" : ""}`}
+                    onClick={() => setSelected(p.id)}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-bold truncate">{p.name}</div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3" /> {p.address}
+                        </div>
+                      </div>
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap ${p.open ? "bg-emerald-500 text-white" : "bg-slate-400 text-white"}`}>
+                        {p.open ? "OPEN" : "CLOSED"}
+                      </span>
+                    </div>
+                    <div className="flex gap-2 mt-4 flex-wrap">
+                      <a href={`tel:${p.phone}`} className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-semibold flex items-center gap-1">
+                        <Phone className="w-3 h-3" /> {p.phone}
+                      </a>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); openMaps(p); }}
+                        className="px-3 py-1.5 rounded-xl bg-gradient-primary text-white text-xs font-semibold flex items-center gap-1"
+                      >
+                        <Navigation className="w-3 h-3" /> Directions
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </AppLayout>
   );

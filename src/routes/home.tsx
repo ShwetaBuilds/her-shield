@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppLayout } from "@/components/hershield/AppLayout";
 import {
-  Siren, MapPin, Mic, Users, Hospital, AudioLines, Shield, ArrowRight, Sparkles,
+  Siren, MapPin, Mic, Users, ShieldCheck, AudioLines, PhoneCall, History,
+  Contact, User, LayoutDashboard, Shield, ArrowRight, Sparkles,
 } from "lucide-react";
 import heroImg from "@/assets/hero.png";
 
@@ -15,13 +16,18 @@ export const Route = createFileRoute("/home")({
   component: Home,
 });
 
-const features = [
-  { icon: Siren, title: "One-Tap SOS Alert", desc: "Trigger instant emergency alerts to all your trusted contacts.", color: "from-pink-500 to-rose-500" },
-  { icon: MapPin, title: "Live Location Tracking", desc: "Real-time location shared with your circle when it matters most.", color: "from-purple-500 to-fuchsia-500" },
-  { icon: Mic, title: "AI Voice Detection", desc: "Detects panic, stress, and emergency keywords automatically.", color: "from-rose-500 to-orange-400" },
-  { icon: Users, title: "Trusted Circle", desc: "Add up to 10+ contacts with priority-based emergency routing.", color: "from-fuchsia-500 to-pink-500" },
-  { icon: Hospital, title: "Nearby Hospitals & Police", desc: "Find the closest verified safe places in seconds.", color: "from-purple-500 to-indigo-500" },
-  { icon: AudioLines, title: "Emergency Audio Recording", desc: "Auto-captures audio evidence during alerts for safety.", color: "from-pink-500 to-purple-500" },
+const modules = [
+  { to: "/sos", icon: Siren, title: "SOS Emergency", desc: "One-tap alert to all your trusted contacts.", color: "from-rose-500 to-pink-600" },
+  { to: "/map", icon: MapPin, title: "Live Location Map", desc: "Real-time map with your location & directions.", color: "from-purple-500 to-fuchsia-500" },
+  { to: "/help-centers", icon: ShieldCheck, title: "Nearest Safe Place", desc: "Hospitals, police, medical stores & safe zones.", color: "from-fuchsia-500 to-pink-500" },
+  { to: "/voice-ai", icon: Mic, title: "Smart Emergency Detection", desc: "AI listens for panic, stress & emergency keywords.", color: "from-purple-500 to-indigo-500" },
+  { to: "/fake-call", icon: PhoneCall, title: "Fake Call", desc: "Discreet escape from unsafe situations.", color: "from-amber-500 to-orange-500" },
+  { to: "/audio-capture", icon: AudioLines, title: "Auto Audio Capture", desc: "Tamper-proof evidence during emergencies.", color: "from-rose-500 to-orange-400" },
+  { to: "/trust-circle", icon: Users, title: "Trust Circle", desc: "Manage your priority emergency contacts.", color: "from-pink-500 to-purple-500" },
+  { to: "/alert-history", icon: History, title: "Alert History", desc: "Every alert, perfectly logged & timestamped.", color: "from-purple-500 to-pink-500" },
+  { to: "/contacts", icon: Contact, title: "Emergency Contacts", desc: "National helplines and quick dial numbers.", color: "from-blue-500 to-indigo-600" },
+  { to: "/profile", icon: User, title: "Profile", desc: "Manage your account, safety & privacy.", color: "from-fuchsia-500 to-purple-500" },
+  { to: "/admin", icon: LayoutDashboard, title: "Admin Access", desc: "SaaS-style monitoring & analytics dashboard.", color: "from-emerald-500 to-teal-500" },
 ];
 
 function Home() {
@@ -43,13 +49,13 @@ function Home() {
               <span className="gradient-text">Our Priority</span>
             </h1>
             <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-xl">
-              Smart protection, instant alerts, trusted emergency support, and AI-powered voice risk detection — designed for women, by people who care.
+              Smart protection, instant alerts, trusted emergency support, and AI-powered Smart Emergency Detection — designed for women, by people who care.
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Link to="/sos" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-primary text-white font-semibold shadow-soft hover:shadow-glow transition-all">
                 <Siren className="w-4 h-4" /> Emergency Help
               </Link>
-              <Link to="/voice-ai" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl glass border-white/60 font-semibold hover:bg-white/90 transition-all">
+              <Link to="/how-to-use" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl glass border-white/60 font-semibold hover:bg-white/90 transition-all">
                 Learn More <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -77,23 +83,33 @@ function Home() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* Modules */}
       <section>
-        <div className="flex items-end justify-between mb-6">
+        <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold">Everything you need, in one place</h2>
-            <p className="text-muted-foreground text-sm mt-1">Premium safety tools, designed to act when seconds matter.</p>
+            <h2 className="text-2xl sm:text-3xl font-bold">All Safety Modules</h2>
+            <p className="text-muted-foreground text-sm mt-1">Tap any card to open its module.</p>
           </div>
+          <Link to="/how-to-use" className="text-sm font-semibold text-primary inline-flex items-center gap-1 hover:gap-2 transition-all">
+            How to use <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {features.map((f) => (
-            <div key={f.title} className="group glass rounded-3xl p-6 hover:-translate-y-1 transition-all duration-300 cursor-pointer">
-              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center shadow-soft mb-4 group-hover:scale-110 transition-transform`}>
-                <f.icon className="w-6 h-6 text-white" />
+          {modules.map((m) => (
+            <Link
+              key={m.to}
+              to={m.to}
+              className="group glass rounded-3xl p-6 hover:-translate-y-1 hover:shadow-glow transition-all duration-300 block"
+            >
+              <div className="flex items-start justify-between">
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${m.color} flex items-center justify-center shadow-soft mb-4 group-hover:scale-110 transition-transform`}>
+                  <m.icon className="w-6 h-6 text-white" />
+                </div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
               </div>
-              <h3 className="font-bold text-lg">{f.title}</h3>
-              <p className="text-sm text-muted-foreground mt-2">{f.desc}</p>
-            </div>
+              <h3 className="font-bold text-lg">{m.title}</h3>
+              <p className="text-sm text-muted-foreground mt-2">{m.desc}</p>
+            </Link>
           ))}
         </div>
       </section>
