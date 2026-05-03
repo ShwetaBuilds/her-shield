@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VoiceAiRouteImport } from './routes/voice-ai'
 import { Route as TrustCircleRouteImport } from './routes/trust-circle'
 import { Route as SosRouteImport } from './routes/sos'
+import { Route as SafetySettingsRouteImport } from './routes/safety-settings'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as HowToUseRouteImport } from './routes/how-to-use'
@@ -37,6 +38,11 @@ const TrustCircleRoute = TrustCircleRouteImport.update({
 const SosRoute = SosRouteImport.update({
   id: '/sos',
   path: '/sos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SafetySettingsRoute = SafetySettingsRouteImport.update({
+  id: '/safety-settings',
+  path: '/safety-settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/how-to-use': typeof HowToUseRoute
   '/map': typeof MapRoute
   '/profile': typeof ProfileRoute
+  '/safety-settings': typeof SafetySettingsRoute
   '/sos': typeof SosRoute
   '/trust-circle': typeof TrustCircleRoute
   '/voice-ai': typeof VoiceAiRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/how-to-use': typeof HowToUseRoute
   '/map': typeof MapRoute
   '/profile': typeof ProfileRoute
+  '/safety-settings': typeof SafetySettingsRoute
   '/sos': typeof SosRoute
   '/trust-circle': typeof TrustCircleRoute
   '/voice-ai': typeof VoiceAiRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/how-to-use': typeof HowToUseRoute
   '/map': typeof MapRoute
   '/profile': typeof ProfileRoute
+  '/safety-settings': typeof SafetySettingsRoute
   '/sos': typeof SosRoute
   '/trust-circle': typeof TrustCircleRoute
   '/voice-ai': typeof VoiceAiRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/how-to-use'
     | '/map'
     | '/profile'
+    | '/safety-settings'
     | '/sos'
     | '/trust-circle'
     | '/voice-ai'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/how-to-use'
     | '/map'
     | '/profile'
+    | '/safety-settings'
     | '/sos'
     | '/trust-circle'
     | '/voice-ai'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/how-to-use'
     | '/map'
     | '/profile'
+    | '/safety-settings'
     | '/sos'
     | '/trust-circle'
     | '/voice-ai'
@@ -207,6 +219,7 @@ export interface RootRouteChildren {
   HowToUseRoute: typeof HowToUseRoute
   MapRoute: typeof MapRoute
   ProfileRoute: typeof ProfileRoute
+  SafetySettingsRoute: typeof SafetySettingsRoute
   SosRoute: typeof SosRoute
   TrustCircleRoute: typeof TrustCircleRoute
   VoiceAiRoute: typeof VoiceAiRoute
@@ -233,6 +246,13 @@ declare module '@tanstack/react-router' {
       path: '/sos'
       fullPath: '/sos'
       preLoaderRoute: typeof SosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/safety-settings': {
+      id: '/safety-settings'
+      path: '/safety-settings'
+      fullPath: '/safety-settings'
+      preLoaderRoute: typeof SafetySettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -327,6 +347,7 @@ const rootRouteChildren: RootRouteChildren = {
   HowToUseRoute: HowToUseRoute,
   MapRoute: MapRoute,
   ProfileRoute: ProfileRoute,
+  SafetySettingsRoute: SafetySettingsRoute,
   SosRoute: SosRoute,
   TrustCircleRoute: TrustCircleRoute,
   VoiceAiRoute: VoiceAiRoute,
@@ -334,3 +355,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

@@ -3,6 +3,7 @@ import { AppLayout } from "@/components/hershield/AppLayout";
 import {
   Siren, MapPin, Mic, Users, ShieldCheck, AudioLines, PhoneCall, History,
   Contact, User, LayoutDashboard, Shield, ArrowRight, Sparkles,
+  EyeOff, Route as RouteIcon, MicVocal, ShieldAlert,
 } from "lucide-react";
 import heroImg from "@/assets/hero.png";
 
@@ -28,6 +29,12 @@ const modules = [
   { to: "/contacts", icon: Contact, title: "Emergency Contacts", desc: "National helplines and quick dial numbers.", color: "from-blue-500 to-indigo-600" },
   { to: "/profile", icon: User, title: "Profile", desc: "Manage your account, safety & privacy.", color: "from-fuchsia-500 to-purple-500" },
   { to: "/admin", icon: LayoutDashboard, title: "Admin Access", desc: "SaaS-style monitoring & analytics dashboard.", color: "from-emerald-500 to-teal-500" },
+];
+
+const newFeatures = [
+  { to: "/safety-settings", icon: EyeOff, title: "Silent SOS Trigger", desc: "Hidden shake / volume / power pattern triggers SOS without opening the app.", color: "from-rose-500 to-pink-600" },
+  { to: "/map", icon: RouteIcon, title: "Safe Route Suggestion", desc: "Avoids isolated areas — picks well-lit, crowded & police-patrolled paths.", color: "from-emerald-500 to-teal-500" },
+  { to: "/safety-settings", icon: MicVocal, title: "Emergency Voice Command", desc: "Say \"Help me\" or \"Save me\" — hands-free SOS even when phone is locked.", color: "from-purple-500 to-fuchsia-500" },
 ];
 
 function Home() {
@@ -85,6 +92,38 @@ function Home() {
 
       {/* Modules */}
       <section>
+        {/* New safety features highlight */}
+        <div className="mb-10">
+          <div className="flex items-end justify-between mb-5 flex-wrap gap-3">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 border border-white/60 text-[11px] font-semibold mb-2">
+                <Sparkles className="w-3 h-3 text-primary" /> NEW
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold">Next-gen safety features</h2>
+              <p className="text-muted-foreground text-sm mt-1">Hidden triggers, smart routing & hands-free emergency.</p>
+            </div>
+            <Link to="/safety-settings" className="text-sm font-semibold text-primary inline-flex items-center gap-1 hover:gap-2 transition-all">
+              <ShieldAlert className="w-4 h-4" /> Open Safety Settings
+            </Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {newFeatures.map((m) => (
+              <Link
+                key={m.title}
+                to={m.to}
+                className="group relative glass rounded-3xl p-6 hover:-translate-y-1 hover:shadow-glow transition-all duration-300 block overflow-hidden"
+              >
+                <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-gradient-primary text-white text-[10px] font-bold shadow-soft">NEW</span>
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${m.color} flex items-center justify-center shadow-soft mb-4 group-hover:scale-110 transition-transform`}>
+                  <m.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-bold text-lg">{m.title}</h3>
+                <p className="text-sm text-muted-foreground mt-2">{m.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+
         <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold">All Safety Modules</h2>

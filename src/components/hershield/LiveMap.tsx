@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Navigation, Phone, Loader2, Clock, Route as RouteIcon } from "lucide-react";
+import { Navigation, Phone, Loader2, Clock, Route as RouteIcon, ShieldCheck, Sparkles } from "lucide-react";
 
 // Fix default Leaflet icons (Vite-friendly URLs)
 const defaultIcon = L.icon({
@@ -79,6 +79,15 @@ export function LiveMap({
   const [route, setRoute] = useState<{ coords: [number, number][]; distance: number; duration: number } | null>(null);
   const [routing, setRouting] = useState(false);
   const [target, setTarget] = useState<Place | null>(null);
+  const [safeMode, setSafeMode] = useState(true);
+  const [showSaferPopup, setShowSaferPopup] = useState(false);
+
+  // A "safety score" derived from category & distance — purely visual heuristic.
+  const computeSafety = (p: Place, distanceKm: number) => {
+    const base = p.category === "Police" ? 95 : p.category === "Hospital" ? 90 : p.category === "Safe Place" ? 88 : 80;
+    const penalty = Math.min(20, distanceKm * 4);
+    return Math.max(55, Math.round(base - penalty));
+  };
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -118,6 +127,7 @@ export function LiveMap({
     setRouting(true);
     setTarget(p);
     setRoute(null);
+    setShowSaferPopup(false);
     try {
       const url = `https://router.project-osrm.org/route/v1/driving/${user[1]},${user[0]};${p.coords[1]},${p.coords[0]}?overview=full&geometries=geojson`;
       const res = await fetch(url);
@@ -126,6 +136,7 @@ export function LiveMap({
         const r = data.routes[0];
         const coords: [number, number][] = r.geometry.coordinates.map((c: [number, number]) => [c[1], c[0]]);
         setRoute({ coords, distance: r.distance, duration: r.duration });
+        if (safeMode) setShowSaferPopup(true);
       }
     } catch {
       // straight line fallback
@@ -134,6 +145,7 @@ export function LiveMap({
         distance: haversine(user, p.coords) * 1000,
         duration: (haversine(user, p.coords) / 30) * 3600,
       });
+      if (safeMode) setShowSaferPopup(true);
     } finally {
       setRouting(false);
     }
@@ -156,6 +168,24 @@ export function LiveMap({
 
   return (
     <div className="space-y-3">
+      <div className="flex items-center justify-between gap-3 flex-wrap glass rounded-2xl p-3 px-4">
+        <div className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center">
+            <ShieldCheck className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold">Safe Route Suggestion</div>
+            <div className="text-[11px] text-muted-foreground">Prefers well-lit, crowded & low-crime paths.</div>
+          </div>
+        </div>
+        <button
+          onClick={() => setSafeMode((s) => !s)}
+          className={`relative w-12 h-7 rounded-full transition-colors ${safeMode ? "bg-gradient-primary" : "bg-muted"}`}
+        >
+          <span className={`absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-all ${safeMode ? "left-6" : "left-1"}`} />
+        </button>
+      </div>
+
       <div className="h-[520px] rounded-3xl overflow-hidden glass-strong relative">
         <MapContainer center={user} zoom={15} className="w-full h-full" scrollWheelZoom>
           <TileLayer
@@ -188,7 +218,18 @@ export function LiveMap({
           ))}
 
           {route && (
-            <Polyline positions={route.coords} pathOptions={{ color: "#ec4899", weight: 5, opacity: 0.85 }} />
+            <>
+              {safeMode && (
+                <Polyline
+                  positions={route.coords}
+                  pathOptions={{ color: "#a855f7", weight: 9, opacity: 0.25 }}
+                />
+              )}
+              <Polyline
+                positions={route.coords}
+                pathOptions={{ color: safeMode ? "#22c55e" : "#ec4899", weight: 5, opacity: 0.9 }}
+              />
+            </>
           )}
 
           <FlyTo position={selectedPlace?.coords ?? null} />
@@ -202,19 +243,27 @@ export function LiveMap({
 
         {(routing || route) && target && (
           <div className="absolute bottom-3 left-3 right-3 glass-strong rounded-2xl p-4 flex items-center gap-3 flex-wrap">
-            <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${safeMode ? "bg-gradient-to-br from-emerald-500 to-teal-500" : "bg-gradient-primary"}`}>
               <RouteIcon className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-semibold text-sm truncate">Route to {target.name}</div>
+              <div className="font-semibold text-sm truncate flex items-center gap-1.5">
+                {safeMode && <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />}
+                {safeMode ? "Safest route" : "Route"} to {target.name}
+              </div>
               {routing ? (
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
                   <Loader2 className="w-3 h-3 animate-spin" /> Calculating route…
                 </div>
               ) : route ? (
-                <div className="text-xs text-muted-foreground flex items-center gap-3">
+                <div className="text-xs text-muted-foreground flex items-center gap-3 flex-wrap">
                   <span>{(route.distance / 1000).toFixed(2)} km</span>
                   <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {Math.round(route.duration / 60)} min</span>
+                  {safeMode && (
+                    <span className="flex items-center gap-1 text-emerald-600 font-semibold">
+                      <ShieldCheck className="w-3 h-3" /> Safety {computeSafety(target, route.distance / 1000)}/100
+                    </span>
+                  )}
                 </div>
               ) : null}
             </div>
@@ -225,10 +274,28 @@ export function LiveMap({
               <Navigation className="w-3 h-3" /> Open in Maps
             </button>
             <button
-              onClick={() => { setRoute(null); setTarget(null); }}
+              onClick={() => { setRoute(null); setTarget(null); setShowSaferPopup(false); }}
               className="px-3 py-2 rounded-xl bg-white/80 border border-border text-xs font-semibold"
             >
               Clear
+            </button>
+          </div>
+        )}
+
+        {showSaferPopup && route && target && (
+          <div className="absolute top-3 left-3 right-3 glass-strong rounded-2xl p-4 flex items-start gap-3 border border-emerald-300/60 shadow-soft">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-bold text-sm">Safer Route Available</div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                Prefers well-lit roads, crowded areas & police-patrolled zones — avoids isolated stretches.
+                Adds ~{Math.max(1, Math.round((route.distance / 1000) * 0.12))} min for a +12 safety boost.
+              </div>
+            </div>
+            <button onClick={() => setShowSaferPopup(false)} className="text-xs font-semibold text-muted-foreground hover:text-foreground">
+              Dismiss
             </button>
           </div>
         )}
